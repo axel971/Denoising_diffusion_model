@@ -46,12 +46,12 @@ def main(data_dir: str):
 
     training_dataloader = DataLoader(dataset = training_data,
                                      batch_size = BATCH_SIZE,
-                                     num_workers = 4,
+                                     num_workers = 3,
                                      shuffle = True)
 
     testing_dataloader = DataLoader(dataset = testing_data,
                                     batch_size = BATCH_SIZE,
-                                    num_workers = 4,
+                                    num_workers = 3,
                                     shuffle = False)
 
     # Device agnostic code
@@ -67,7 +67,7 @@ def main(data_dir: str):
     loss_fn = nn.MSELoss()
 
     # Train the network
-    EPOCHS = 1
+    EPOCHS = 2
 
     results = diffusion_model.train(dataloader = training_dataloader,
                           loss_fn = loss_fn,
@@ -106,7 +106,6 @@ for epoch in tqdm(range(40_000)):
         plt.plot(training_loss[-1000:])
         plt.savefig('training_loss_cropped.png')
         plt.close()
-
     """
 if __name__ == "__main__":
 
