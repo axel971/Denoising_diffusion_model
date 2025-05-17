@@ -63,11 +63,11 @@ def main(data_dir: str):
     diffusion_model = DiffusionModel(1000, model, device)
 
     # Initialize the loss function and optimizer
-    optimizer = torch.optim.Adam(model.parameters(), lr = 2e-5)
+    optimizer = torch.optim.Adam(model.parameters(), lr = 1e-4)
     loss_fn = nn.MSELoss()
 
     # Train the network
-    EPOCHS = 2
+    EPOCHS = 4
 
     results = diffusion_model.train(dataloader = training_dataloader,
                           loss_fn = loss_fn,

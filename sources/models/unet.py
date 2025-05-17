@@ -31,7 +31,11 @@ class DownSample(nn.Module):
     """
     super(DownSample, self).__init__()
 
-    self.conv = nn.Conv2d(C, C, 3, stride=2, padding = 1)
+    self.conv = nn.Conv2d(in_channels = C,
+                          out_channels = C,
+                          kernel_size = 2,
+                          stride = 2,
+                          padding = 0)
 
   def forward(self, x):
 
@@ -50,15 +54,15 @@ class UpSample(nn.Module):
     """
     super(UpSample, self).__init__()
 
-    self.conv = nn.Conv2d(C, C, 3, stride=1, padding = 1)
+    self.conv = nn.ConvTranspose2d(in_channels = C,
+                                   out_channels = C,
+                                   kernel_size = 2,
+                                   stride = 2,
+                                   padding = 0)
 
   def forward(self, x):
 
     B, C, H, W = x.shape
-
-    x = nn.functional.interpolate(x,
-                                  size = None, scale_factor = 2,
-                                  mode = 'nearest')
     x = self.conv(x)
     assert x.shape == (B, C, H * 2, W * 2)
 

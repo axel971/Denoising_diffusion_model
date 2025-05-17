@@ -69,7 +69,7 @@ class DiffusionModel():
 
         for epoch in range(epochs):
 
-            print(f"Epoch: {epoch + 1}/{epochs}: ")
+            print(f"Epoch {epoch + 1}/{epochs}: ")
             
             loss_value = self.training_step(dataloader = dataloader,
                                         optimizer = optimizer,
