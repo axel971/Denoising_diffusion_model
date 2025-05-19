@@ -67,7 +67,7 @@ def main(data_dir: str):
     loss_fn = nn.MSELoss()
 
     # Train the network
-    EPOCHS = 4
+    EPOCHS = 20
 
     results = diffusion_model.train(dataloader = training_dataloader,
                           loss_fn = loss_fn,
