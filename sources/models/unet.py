@@ -87,15 +87,15 @@ class ResNetBlock(nn.Module):
     super(ResNetBlock, self).__init__()
 
 
-    self.conv1 = nn.Conv2d(in_ch, out_ch, 3, stride = 1, padding = 1)
+    self.conv1 = nn.Conv2d(in_ch, out_ch, 3, stride = 1, padding = "same")
     self.dense = nn.Linear(512, out_ch)
-    self.conv2 = nn.Conv2d(out_ch, out_ch, 3, stride = 1, padding = 1)
-
+    self.conv2 = nn.Conv2d(out_ch, out_ch, 3, stride = 1, padding = "same")
+    
     if not (in_ch == out_ch):
-      self.nin = Nin(in_ch, out_ch)
+      self.conv3 = nn.Conv2d(in_ch, out_ch, 1, stride = 1, padding = "same")
 
     self.dropout_rate = dropout_rate
-    self.silu = torch.nn.SiLU()
+    self.mish = torch.nn.Mish()
 
   def forward(self, x, temb):
     """
@@ -103,18 +103,18 @@ class ResNetBlock(nn.Module):
     :param temb: (B, dim)
     """
 
-    h = self.silu(nn.functional.group_norm(x, num_groups = 32))
-    h = self.conv1(h) # To Do: check if it is h or x as input of conv1
+    h = self.mish(nn.functional.group_norm(x, num_groups = 32))
+    h = self.conv1(h) 
 
     # Add timestep embedding
-    h += self.dense(self.silu(temb))[:, :, None, None]
+    h += self.dense(self.mish(temb))[:, :, None, None]
 
-    h = self.silu(nn.functional.group_norm(h, num_groups=32))
+    h = self.mish(nn.functional.group_norm(h, num_groups=32))
     h = nn.functional.dropout(h, p = self.dropout_rate)
     h = self.conv2(h)
 
     if not (x.shape[1] == h.shape[1]):
-      x = self.nin(x)
+      x = self.conv3(x)
 
     assert x.shape == h.shape
 
@@ -164,7 +164,7 @@ class UNet(nn.Module):
     self.linear1 = nn.Linear(ch, 4 * ch)
     self.linear2 = nn.Linear(4*ch, 4*ch)
 
-    self.conv1 = nn.Conv2d(in_ch, ch, 3, stride= 1, padding = 1)
+    self.conv1 = nn.Conv2d(in_ch, ch, 3, stride= 1, padding = "same")
 
     self.down = nn.ModuleList([ResNetBlock(ch, 1*ch),
                                ResNetBlock(1*ch, 1*ch),
@@ -205,7 +205,7 @@ class UNet(nn.Module):
                              ResNetBlock(2 * ch, ch)
                              ])
 
-    self.final_conv = nn.Conv2d(ch, in_ch, 3, stride = 1, padding = 1)
+    self.final_conv = nn.Conv2d(ch, in_ch, 3, stride = 1, padding = "same")
 
   def forward(self, x, t):
     """
